@@ -1,0 +1,6 @@
+{
+  "name": "FinFlow Ethiopia",
+  "description": "Automated digital banking dashboard and finance portal featuring all 31 licensed Ethiopian banks, real-time RTGS transfers, multi-account management, bilingual Amharic/English support, and AI financial advisory.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

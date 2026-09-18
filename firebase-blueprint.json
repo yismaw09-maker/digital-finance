@@ -1,0 +1,121 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with contact details",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 150 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["fullName", "email"]
+    },
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "User linked bank account",
+      "type": "object",
+      "properties": {
+        "accountNo": { "type": "string", "maxLength": 50 },
+        "bank": { "type": "string", "maxLength": 100 },
+        "name": { "type": "string", "maxLength": 100 },
+        "balance": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["accountNo", "bank", "name", "balance"]
+    },
+    "TransactionRecord": {
+      "title": "TransactionRecord",
+      "description": "Financial transaction record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 80 },
+        "type": { "type": "string", "maxLength": 40 },
+        "amount": { "type": "number" },
+        "fee": { "type": "number" },
+        "vat": { "type": "number" },
+        "totalDebit": { "type": "number" },
+        "balanceAfter": { "type": "number" },
+        "date": { "type": "string", "maxLength": 40 },
+        "time": { "type": "string", "maxLength": 40 },
+        "timestamp": { "type": "string", "maxLength": 50 },
+        "bank": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "accountNo": { "type": "string", "maxLength": 50 },
+        "direction": { "type": "string", "enum": ["in", "out"] },
+        "recipientName": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "amount", "date", "bank", "title", "direction"]
+    },
+    "ReceiptRecord": {
+      "title": "ReceiptRecord",
+      "description": "Payment receipt voucher or RTGS advice",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 80 },
+        "title": { "type": "string", "maxLength": 150 },
+        "amount": { "type": "number" },
+        "totalDebit": { "type": "number" },
+        "date": { "type": "string", "maxLength": 40 },
+        "time": { "type": "string", "maxLength": 40 },
+        "senderBank": { "type": "string", "maxLength": 100 },
+        "receiverName": { "type": "string", "maxLength": 100 },
+        "utr": { "type": "string", "maxLength": 80 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "amount", "date", "receiverName"]
+    },
+    "SavedCard": {
+      "title": "SavedCard",
+      "description": "Saved bank card information",
+      "type": "object",
+      "properties": {
+        "cardNumber": { "type": "string", "maxLength": 30 },
+        "cardType": { "type": "string", "maxLength": 50 },
+        "expiry": { "type": "string", "maxLength": 10 },
+        "bank": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["cardNumber", "cardType", "expiry", "bank"]
+    },
+    "SavingsGoal": {
+      "title": "SavingsGoal",
+      "description": "Financial savings goal",
+      "type": "object",
+      "properties": {
+        "goalName": { "type": "string", "maxLength": 100 },
+        "targetAmount": { "type": "number" },
+        "saved": { "type": "number" },
+        "deadline": { "type": "string", "maxLength": 30 }
+      },
+      "required": ["goalName", "targetAmount", "saved"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with user credentials and contact information"
+    },
+    "/users/{userId}/accounts/{accountId}": {
+      "schema": "UserAccount",
+      "description": "User linked bank accounts across Ethiopian banks"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "TransactionRecord",
+      "description": "User historical and live banking transactions"
+    },
+    "/users/{userId}/receipts/{receiptId}": {
+      "schema": "ReceiptRecord",
+      "description": "User payment vouchers and RTGS transfer receipts"
+    },
+    "/users/{userId}/cards/{cardId}": {
+      "schema": "SavedCard",
+      "description": "User linked debit and ATM cards"
+    },
+    "/users/{userId}/savingsGoals/{goalId}": {
+      "schema": "SavingsGoal",
+      "description": "User target savings goals"
+    }
+  }
+}

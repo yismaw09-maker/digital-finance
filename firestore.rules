@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data) {
+      return data.fullName is string && data.fullName.size() > 0 && data.fullName.size() <= 100
+        && data.email is string && data.email.size() > 0 && data.email.size() <= 150
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 30));
+    }
+
+    function isValidUserAccount(data) {
+      return data.accountNo is string && data.accountNo.size() > 0 && data.accountNo.size() <= 50
+        && data.bank is string && data.bank.size() > 0 && data.bank.size() <= 100
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.balance is number && data.balance >= 0;
+    }
+
+    function isValidTransaction(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 80
+        && data.amount is number && data.amount > 0
+        && data.direction in ['in', 'out']
+        && data.bank is string && data.bank.size() <= 100
+        && data.title is string && data.title.size() <= 200;
+    }
+
+    function isValidReceipt(data) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 80
+        && data.amount is number && data.amount >= 0
+        && data.title is string && data.title.size() <= 150
+        && data.receiverName is string && data.receiverName.size() <= 100;
+    }
+
+    function isValidCard(data) {
+      return data.cardNumber is string && data.cardNumber.size() <= 30
+        && data.cardType is string && data.cardType.size() <= 50
+        && data.bank is string && data.bank.size() <= 100;
+    }
+
+    function isValidGoal(data) {
+      return data.goalName is string && data.goalName.size() > 0 && data.goalName.size() <= 100
+        && data.targetAmount is number && data.targetAmount > 0
+        && data.saved is number && data.saved >= 0;
+    }
+
+    // User Profile
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+
+      // User Accounts
+      match /accounts/{accountId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(accountId) && isValidUserAccount(incoming());
+        allow update: if isOwner(userId) && isValidId(accountId) && isValidUserAccount(incoming());
+        allow delete: if isOwner(userId) && isValidId(accountId);
+      }
+
+      // User Transactions
+      match /transactions/{transactionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(incoming());
+      }
+
+      // User Receipts
+      match /receipts/{receiptId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(receiptId) && isValidReceipt(incoming());
+      }
+
+      // User Cards
+      match /cards/{cardId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(cardId) && isValidCard(incoming());
+        allow delete: if isOwner(userId) && isValidId(cardId);
+      }
+
+      // User Savings Goals
+      match /savingsGoals/{goalId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(goalId) && isValidGoal(incoming());
+        allow delete: if isOwner(userId) && isValidId(goalId);
+      }
+    }
+  }
+}
